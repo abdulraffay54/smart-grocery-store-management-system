@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Smart Grocery Store — Interactive Demo</title>
+  <title>Smart Grocery Store — Interactive Demo &amp; Analytics</title>
   <meta
     name="description"
-    content="Interactive browser demo of the Smart Grocery Store Management System Python program."
+    content="Interactive browser demo of the Smart Grocery Store Management System, with a preloaded sample catalog and live store analytics."
   />
   <style>
     :root {
@@ -21,7 +21,9 @@
       --accent: #34d399;
       --accent-soft: rgba(52, 211, 153, 0.12);
       --accent-2: #38bdf8;
-      --danger: #f87171;
+      --violet: #a78bfa;
+      --amber: #fbbf24;
+      --danger: #fb7185;
       --mono: "JetBrains Mono", "Cascadia Code", Consolas, "SFMono-Regular", Menlo, monospace;
       --sans: "Segoe UI", Inter, system-ui, -apple-system, sans-serif;
     }
@@ -44,7 +46,7 @@
     a { color: var(--accent); }
 
     .wrap {
-      max-width: 1280px;
+      max-width: 1340px;
       margin: 0 auto;
       padding: 34px 22px 54px;
     }
@@ -87,7 +89,7 @@
     }
 
     .lede {
-      max-width: 680px;
+      max-width: 720px;
       margin: 10px 0 0;
       color: var(--muted);
       font-size: 15px;
@@ -112,6 +114,7 @@
     }
 
     .badge strong { color: var(--text); font-weight: 600; }
+    .badge.dataset { border-color: rgba(52, 211, 153, 0.3); color: #a9d9c7; }
 
     .header-actions {
       display: flex;
@@ -121,13 +124,18 @@
 
     .layout {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 350px;
+      grid-template-columns: minmax(0, 1fr) 340px;
       gap: 20px;
       align-items: start;
     }
 
-    @media (max-width: 980px) {
+    @media (max-width: 1080px) {
       .layout { grid-template-columns: 1fr; }
+      .side { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      .side { grid-template-columns: 1fr; }
     }
 
     .terminal {
@@ -361,6 +369,14 @@
 
     .btn-ghost:hover:not(:disabled) { background: #122136; }
 
+    .btn-danger {
+      border-color: rgba(251, 113, 133, 0.28);
+      background: rgba(251, 113, 133, 0.07);
+      color: #f2aeb8;
+    }
+
+    .btn-danger:hover:not(:disabled) { background: rgba(251, 113, 133, 0.14); }
+
     .menu-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -404,42 +420,36 @@
 
     .menu-btn:disabled { opacity: 0.32; cursor: not-allowed; }
 
-    .stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    .stat {
-      padding: 10px 11px;
+    .dataset-status {
+      margin: 0;
+      padding: 11px 12px;
       border: 1px solid var(--border-soft);
       border-radius: 9px;
       background: #0a1322;
-    }
-
-    .stat .label {
-      display: block;
-      margin-bottom: 4px;
-      color: #7d92b2;
-      font-size: 10.5px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .stat .value {
-      color: #f1f6ff;
+      color: #d7e5f7;
       font-family: var(--mono);
-      font-size: 17px;
-      font-weight: 600;
+      font-size: 12px;
+      line-height: 1.55;
     }
 
-    .stat .value.accent { color: var(--accent); }
+    .dataset-status span { display: block; }
+    .dataset-status b { color: var(--accent); font-weight: 600; }
 
     .muted {
       margin: 10px 0 0;
       color: #7d92b2;
       font-size: 12px;
       line-height: 1.6;
+    }
+
+    .muted code {
+      padding: 1px 4px;
+      border: 1px solid var(--border-soft);
+      border-radius: 4px;
+      background: #0a1220;
+      color: #a9d9c7;
+      font-family: var(--mono);
+      font-size: 11px;
     }
 
     .kbd-row {
@@ -458,6 +468,464 @@
       color: #c4d4ea;
       font-family: var(--mono);
       font-size: 11px;
+    }
+
+    /* ------------------------------------------------------------------
+     * Analytics dashboard
+     * ------------------------------------------------------------------ */
+    .analytics { margin-top: 28px; }
+
+    .section-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .section-head h2 {
+      margin: 0;
+      font-size: clamp(20px, 2.4vw, 27px);
+      letter-spacing: -0.02em;
+    }
+
+    .section-sub {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .section-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 9px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: #0b1423;
+      color: #93a8c7;
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    .tag.green { border-color: rgba(52, 211, 153, 0.28); background: var(--accent-soft); color: var(--accent); }
+    .tag.blue { border-color: rgba(56, 189, 248, 0.28); background: rgba(56, 189, 248, 0.1); color: var(--accent-2); }
+    .tag.amber { border-color: rgba(251, 191, 36, 0.28); background: rgba(251, 191, 36, 0.09); color: var(--amber); }
+    .tag.red { border-color: rgba(251, 113, 133, 0.28); background: rgba(251, 113, 133, 0.09); color: var(--danger); }
+
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .kpi {
+      position: relative;
+      overflow: hidden;
+      padding: 14px 15px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(16, 26, 44, 0.94), rgba(10, 17, 29, 0.94));
+    }
+
+    .kpi::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 2px;
+      background: var(--bar, var(--accent));
+      opacity: 0.7;
+    }
+
+    .kpi.green { --bar: var(--accent); }
+    .kpi.blue { --bar: var(--accent-2); }
+    .kpi.amber { --bar: var(--amber); }
+    .kpi.red { --bar: var(--danger); }
+    .kpi.violet { --bar: var(--violet); }
+
+    .kpi-label {
+      display: block;
+      color: #7d92b2;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .kpi-value {
+      display: block;
+      margin-top: 5px;
+      color: #f3f8ff;
+      font-family: var(--mono);
+      font-size: 21px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      overflow-wrap: anywhere;
+    }
+
+    .kpi.green .kpi-value { color: var(--accent); }
+    .kpi.amber .kpi-value { color: var(--amber); }
+    .kpi.red .kpi-value { color: var(--danger); }
+
+    .kpi-sub {
+      display: block;
+      margin-top: 4px;
+      color: #647a9b;
+      font-size: 10.5px;
+      line-height: 1.35;
+    }
+
+    .insights {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .insight {
+      padding: 10px 12px;
+      border: 1px solid var(--border-soft);
+      border-left: 2px solid var(--bar, var(--accent));
+      border-radius: 9px;
+      background: rgba(10, 18, 32, 0.72);
+    }
+
+    .insight.green { --bar: var(--accent); }
+    .insight.blue { --bar: var(--accent-2); }
+    .insight.amber { --bar: var(--amber); }
+    .insight.violet { --bar: var(--violet); }
+
+    .insight span {
+      display: block;
+      color: #7188a8;
+      font-size: 9.5px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .insight strong {
+      display: block;
+      margin-top: 3px;
+      color: #eaf2fe;
+      font-size: 12.5px;
+      line-height: 1.3;
+    }
+
+    .insight em {
+      display: block;
+      margin-top: 2px;
+      color: #6e85a5;
+      font-size: 10.5px;
+      font-style: normal;
+    }
+
+    .dash-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 14px;
+      align-items: stretch;
+    }
+
+    @media (max-width: 1040px) {
+      .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .dash-grid { grid-template-columns: 1fr 1fr; }
+      .dash-grid .panel:last-child { grid-column: 1 / -1; }
+    }
+
+    @media (max-width: 720px) {
+      .kpis { grid-template-columns: 1fr 1fr; }
+      .insights { grid-template-columns: 1fr 1fr; }
+      .dash-grid { grid-template-columns: 1fr; }
+      .dash-grid .panel:last-child { grid-column: auto; }
+    }
+
+    @media (max-width: 460px) {
+      .kpis { grid-template-columns: 1fr; }
+      .insights { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      display: flex;
+      flex-direction: column;
+      padding: 16px 17px;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      background: linear-gradient(180deg, rgba(16, 26, 44, 0.92), rgba(10, 17, 29, 0.92));
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .panel-head h3 {
+      margin: 0;
+      color: #e6effc;
+      font-size: 12.5px;
+      font-weight: 650;
+      letter-spacing: 0.01em;
+    }
+
+    .panel-head span {
+      color: #637a9b;
+      font-size: 9.5px;
+      line-height: 1.4;
+      text-align: right;
+    }
+
+    .chart {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .bar-top {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 11.5px;
+    }
+
+    .bar-name { color: #b9cce6; font-weight: 600; }
+    .bar-val { color: #e4eefc; font-family: var(--mono); font-size: 11px; }
+
+    .bar-track {
+      height: 8px;
+      margin-top: 5px;
+      overflow: hidden;
+      border: 1px solid #17243a;
+      border-radius: 99px;
+      background: #0a1424;
+    }
+
+    .bar-fill {
+      display: block;
+      height: 100%;
+      min-width: 3px;
+      border-radius: 99px;
+      background: linear-gradient(90deg, #1f8a68, #34d399);
+    }
+
+    .bar-fill.blue { background: linear-gradient(90deg, #1c6f95, #38bdf8); }
+    .bar-fill.amber { background: linear-gradient(90deg, #a97a12, #fbbf24); }
+    .bar-fill.red { background: linear-gradient(90deg, #a83d50, #fb7185); }
+
+    .bar-sub {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 4px;
+      color: #617897;
+      font-size: 9.5px;
+    }
+
+    .seller-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+    }
+
+    .rank {
+      display: inline-grid;
+      place-items: center;
+      flex: 0 0 auto;
+      width: 20px;
+      height: 20px;
+      margin-top: 1px;
+      border: 1px solid #22344f;
+      border-radius: 6px;
+      background: #0b1728;
+      color: #8fa8c8;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .seller-main { flex: 1; min-width: 0; }
+
+    .seller-top {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .seller-top b {
+      overflow: hidden;
+      color: #c6d8ee;
+      font-size: 11.5px;
+      font-weight: 600;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .seller-top span { color: var(--accent); font-family: var(--mono); font-size: 10.5px; }
+    .seller-meta { display: flex; justify-content: space-between; gap: 8px; margin-top: 4px; color: #617897; font-size: 9.5px; }
+
+    .watch-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 8px 10px;
+      border: 1px solid rgba(251, 113, 133, 0.14);
+      border-radius: 8px;
+      background: rgba(251, 113, 133, 0.045);
+    }
+
+    .watch-main { flex: 1; min-width: 0; }
+    .watch-main b { display: block; color: #f0d7db; font-size: 11.5px; }
+    .watch-main span { display: block; margin-top: 1px; color: #8b7079; font-size: 9.5px; }
+    .watch-stock { color: var(--danger); font-family: var(--mono); font-size: 15px; font-weight: 600; }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 6px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      font-size: 8.5px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .status-pill.ok { border-color: rgba(52, 211, 153, 0.24); background: rgba(52, 211, 153, 0.1); color: var(--accent); }
+    .status-pill.low { border-color: rgba(251, 191, 36, 0.24); background: rgba(251, 191, 36, 0.1); color: var(--amber); }
+    .status-pill.out { border-color: rgba(251, 113, 133, 0.24); background: rgba(251, 113, 133, 0.1); color: var(--danger); }
+
+    .empty-note {
+      margin: 0;
+      padding: 16px 12px;
+      border: 1px dashed #20324e;
+      border-radius: 9px;
+      color: #7188a8;
+      font-size: 11.5px;
+      line-height: 1.55;
+      text-align: center;
+    }
+
+    .table-card { margin-top: 14px; }
+
+    .table-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .table-head h3 {
+      margin: 0;
+      color: #e6effc;
+      font-size: 12.5px;
+      font-weight: 650;
+    }
+
+    .table-tools {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+    }
+
+    .table-count { color: #647a9b; font-family: var(--mono); font-size: 10px; }
+
+    .filter-input {
+      width: 220px;
+      max-width: 100%;
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      outline: 0;
+      background: #091322;
+      color: #d8e6f8;
+      font-family: var(--sans);
+      font-size: 11.5px;
+    }
+
+    .filter-input:focus { border-color: rgba(52, 211, 153, 0.45); }
+    .filter-input::placeholder { color: #586e90; }
+
+    .table-scroll {
+      overflow: auto;
+      border: 1px solid var(--border-soft);
+      border-radius: 9px;
+      max-height: 420px;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11.8px;
+      white-space: nowrap;
+    }
+
+    .data-table th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--border);
+      background: #0b1525;
+      color: #7f96b7;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-align: left;
+      text-transform: uppercase;
+    }
+
+    .data-table td {
+      padding: 9px 12px;
+      border-top: 1px solid rgba(23, 36, 58, 0.65);
+      color: #b7cbe4;
+    }
+
+    .data-table tbody tr:hover { background: rgba(56, 189, 248, 0.04); }
+    .data-table .num { text-align: right; font-family: var(--mono); }
+    .data-table .id { color: #7dd3fc; font-family: var(--mono); }
+    .data-table .product { color: #e3eefc; font-weight: 600; }
+    .data-table .category { color: #93a8c7; }
+    .data-table .value { color: #cfe1f7; }
+    .data-table .stock { font-weight: 600; }
+    .data-table .stock.low { color: var(--amber); }
+    .data-table .stock.out { color: var(--danger); }
+
+    .data-table tfoot td {
+      padding: 10px 12px;
+      border-top: 1px solid var(--border);
+      background: #0a1322;
+      color: #8ca3c3;
+      font-size: 10.5px;
+    }
+
+    .data-table tfoot .num { color: #dbe8f8; }
+
+    .empty-cell {
+      padding: 22px 12px !important;
+      color: #7188a8 !important;
+      text-align: center;
+      white-space: normal;
     }
 
     footer.page-foot {
@@ -495,6 +963,8 @@
       .menu-grid { grid-template-columns: 1fr; }
       .prompt-label { font-size: 12px; }
       #command-input { font-size: 16px; } /* avoids iOS zoom */
+      .filter-input { width: 100%; }
+      .table-tools { width: 100%; }
     }
   </style>
 </head>
@@ -505,14 +975,14 @@
         <p class="eyebrow">Interactive demo · Week 01 Python Basics</p>
         <h1>Smart Grocery Store</h1>
         <p class="lede">
-          A live, browser-based version of <strong>smart_store_management.py</strong>. Add products,
-          update stock, process sales, and generate the store report using the same menu, validation,
-          and messages as the Python program.
+          A live, browser-based version of <strong>smart_store_management.py</strong>, with a preloaded
+          sample catalog and an analytics dashboard. Add products, update stock, process sales, and see
+          every metric recalculate using the same menu, validation, and messages as the Python program.
         </p>
         <div class="badges">
           <span class="badge"><strong>Python 3</strong> concept demo</span>
           <span class="badge">No install needed</span>
-          <span class="badge">Data stays in memory</span>
+          <span class="badge dataset" id="dataset-badge">Loading sample data…</span>
         </div>
       </div>
       <div class="header-actions">
@@ -521,105 +991,181 @@
       </div>
     </header>
 
-    <main class="layout">
-      <section class="terminal" aria-label="Smart Grocery Store terminal demo">
-        <div class="terminal-bar">
-          <span class="dot red"></span>
-          <span class="dot yellow"></span>
-          <span class="dot green"></span>
-          <span class="terminal-title">smart_store_management.py — Python 3</span>
-          <span class="live-pill" id="live-pill">live</span>
+    <main>
+      <div class="layout">
+        <section class="terminal" aria-label="Smart Grocery Store terminal demo">
+          <div class="terminal-bar">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+            <span class="terminal-title">smart_store_management.py — Python 3</span>
+            <span class="live-pill" id="live-pill">live</span>
+          </div>
+
+          <div
+            class="terminal-output"
+            id="output"
+            role="log"
+            aria-live="polite"
+            aria-label="Program output"
+          ></div>
+
+          <form class="terminal-input-row" id="input-form" autocomplete="off">
+            <label class="sr-only" for="command-input">Terminal input</label>
+            <span class="prompt-label" id="prompt-label">Enter your choice:</span>
+            <input
+              id="command-input"
+              type="text"
+              inputmode="text"
+              placeholder="Type a menu number (1–8) and press Enter"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <button class="send-btn" id="send-btn" type="submit">Send</button>
+          </form>
+
+          <div class="terminal-foot">
+            Tip: menu shortcuts are enabled only on the main menu, just like the real program.
+          </div>
+        </section>
+
+        <aside class="side">
+          <section class="card">
+            <h2><span class="icon">▶</span> Run the demo</h2>
+            <ol class="steps">
+              <li>The store starts with <strong>8 products</strong> and <strong>4 sales</strong> so the analytics are populated.</li>
+              <li>Click <strong>Run guided demo</strong> to add a product, sell 2 units, and open the report.</li>
+              <li>Or type <code>1</code>–<code>8</code> in the terminal and press <strong>Enter</strong>.</li>
+            </ol>
+            <div class="controls">
+              <button class="btn btn-primary" id="demo-btn" type="button">▶ Run guided demo</button>
+              <button class="btn btn-ghost" id="reset-btn" type="button">↻ Reload sample data</button>
+              <button class="btn btn-danger" id="clear-btn" type="button">✕ Clear all data</button>
+            </div>
+          </section>
+
+          <section class="card">
+            <h2><span class="icon">⌘</span> Main menu shortcuts</h2>
+            <div class="menu-grid" id="menu-grid">
+              <button class="menu-btn" type="button" data-choice="1"><span class="num">1</span> Add product</button>
+              <button class="menu-btn" type="button" data-choice="2"><span class="num">2</span> View products</button>
+              <button class="menu-btn" type="button" data-choice="3"><span class="num">3</span> Search</button>
+              <button class="menu-btn" type="button" data-choice="4"><span class="num">4</span> Update stock</button>
+              <button class="menu-btn" type="button" data-choice="5"><span class="num">5</span> Process sale</button>
+              <button class="menu-btn" type="button" data-choice="6"><span class="num">6</span> Sales records</button>
+              <button class="menu-btn" type="button" data-choice="7"><span class="num">7</span> Store report</button>
+              <button class="menu-btn" type="button" data-choice="8"><span class="num">8</span> Exit</button>
+            </div>
+          </section>
+
+          <section class="card">
+            <h2><span class="icon">◈</span> Current dataset</h2>
+            <p class="dataset-status" id="dataset-summary">
+              <span><b>8</b> products · <b>4</b> sales</span>
+              <span>Sample data preloaded</span>
+            </p>
+            <p class="muted">
+              Use <strong>Clear all data</strong> to start from an empty store, matching the Python program’s
+              initial state. <strong>Reload sample data</strong> restores the catalog and sales above.
+            </p>
+          </section>
+
+          <section class="card">
+            <h2><span class="icon">≡</span> Try these inputs</h2>
+            <div class="kbd-row">
+              <kbd>5</kbd><kbd>101</kbd><kbd>2</kbd>
+            </div>
+            <p class="muted">Sell 2 units of Rice and watch stock, revenue, and top-seller metrics change.</p>
+            <div class="kbd-row">
+              <kbd>3</kbd><kbd>green tea</kbd>
+            </div>
+            <p class="muted">Search is case-insensitive and matches the full product name or ID.</p>
+            <div class="kbd-row">
+              <kbd>4</kbd><kbd>103</kbd><kbd>1</kbd><kbd>10</kbd>
+            </div>
+            <p class="muted">Restock Sugar and watch the low-stock count fall. Enter <kbd>7</kbd> for the full store report.</p>
+          </section>
+        </aside>
+      </div>
+
+      <section class="analytics" aria-labelledby="analytics-title">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Live metrics</p>
+            <h2 id="analytics-title">Store analytics</h2>
+            <p class="section-sub" id="analytics-sub">Calculating totals…</p>
+          </div>
+          <div class="section-tags">
+            <span class="tag green" id="analytics-live-tag">● auto-updates</span>
+            <span class="tag blue">in memory</span>
+            <span class="tag amber" id="analytics-low-tag">0 low stock</span>
+          </div>
         </div>
 
-        <div
-          class="terminal-output"
-          id="output"
-          role="log"
-          aria-live="polite"
-          aria-label="Program output"
-        ></div>
+        <div class="kpis" id="kpi-grid"></div>
+        <div class="insights" id="insight-strip"></div>
 
-        <form class="terminal-input-row" id="input-form" autocomplete="off">
-          <label class="sr-only" for="command-input">Terminal input</label>
-          <span class="prompt-label" id="prompt-label">Enter your choice:</span>
-          <input
-            id="command-input"
-            type="text"
-            inputmode="text"
-            placeholder="Type a menu number (1–8) and press Enter"
-            autocomplete="off"
-            spellcheck="false"
-          />
-          <button class="send-btn" id="send-btn" type="submit">Send</button>
-        </form>
+        <div class="dash-grid">
+          <section class="panel">
+            <div class="panel-head">
+              <h3>Revenue by category</h3>
+              <span>share of total sales</span>
+            </div>
+            <div class="chart" id="category-chart"></div>
+          </section>
 
-        <div class="terminal-foot">
-          Tip: menu shortcuts are enabled only on the main menu, just like the real program.
+          <section class="panel">
+            <div class="panel-head">
+              <h3>Top sellers</h3>
+              <span>by revenue</span>
+            </div>
+            <div class="chart" id="top-sellers"></div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h3>Stock watchlist</h3>
+              <span>below 5 units</span>
+            </div>
+            <div class="chart" id="stock-watch"></div>
+          </section>
         </div>
+
+        <section class="card table-card">
+          <div class="table-head">
+            <h3>Product inventory</h3>
+            <div class="table-tools">
+              <span class="table-count" id="table-count">0 products</span>
+              <label class="sr-only" for="table-filter">Filter products</label>
+              <input
+                class="filter-input"
+                id="table-filter"
+                type="search"
+                placeholder="Filter by name, ID, or category"
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Product</th>
+                  <th scope="col">Category</th>
+                  <th scope="col" class="num">Price</th>
+                  <th scope="col" class="num">Stock</th>
+                  <th scope="col" class="num">Inventory value</th>
+                  <th scope="col">Status</th>
+                </tr>
+              </thead>
+              <tbody id="product-rows"></tbody>
+              <tfoot id="product-totals"></tfoot>
+            </table>
+          </div>
+        </section>
       </section>
-
-      <aside class="side">
-        <section class="card">
-          <h2><span class="icon">▶</span> Run the demo</h2>
-          <ol class="steps">
-            <li>Click <strong>Run sample demo</strong> to watch the full flow automatically.</li>
-            <li>Or type <code>1</code>–<code>8</code> in the terminal and press <strong>Enter</strong>.</li>
-            <li>Use the menu shortcuts below once the main menu is showing.</li>
-          </ol>
-          <div class="controls">
-            <button class="btn btn-primary" id="demo-btn" type="button">▶ Run sample demo</button>
-            <button class="btn btn-ghost" id="restart-btn" type="button">↻ Restart demo</button>
-          </div>
-        </section>
-
-        <section class="card">
-          <h2><span class="icon">⌘</span> Main menu shortcuts</h2>
-          <div class="menu-grid" id="menu-grid">
-            <button class="menu-btn" type="button" data-choice="1"><span class="num">1</span> Add product</button>
-            <button class="menu-btn" type="button" data-choice="2"><span class="num">2</span> View products</button>
-            <button class="menu-btn" type="button" data-choice="3"><span class="num">3</span> Search</button>
-            <button class="menu-btn" type="button" data-choice="4"><span class="num">4</span> Update stock</button>
-            <button class="menu-btn" type="button" data-choice="5"><span class="num">5</span> Process sale</button>
-            <button class="menu-btn" type="button" data-choice="6"><span class="num">6</span> Sales records</button>
-            <button class="menu-btn" type="button" data-choice="7"><span class="num">7</span> Store report</button>
-            <button class="menu-btn" type="button" data-choice="8"><span class="num">8</span> Exit</button>
-          </div>
-        </section>
-
-        <section class="card">
-          <h2><span class="icon">▦</span> Live store status</h2>
-          <div class="stats">
-            <div class="stat">
-              <span class="label">Products</span>
-              <span class="value" id="stat-products">0</span>
-            </div>
-            <div class="stat">
-              <span class="label">Units in stock</span>
-              <span class="value" id="stat-stock">0</span>
-            </div>
-            <div class="stat">
-              <span class="label">Sales</span>
-              <span class="value" id="stat-sales">0</span>
-            </div>
-            <div class="stat">
-              <span class="label">Revenue</span>
-              <span class="value accent" id="stat-revenue">Rs. 0</span>
-            </div>
-          </div>
-          <p class="muted">Updates after every action. Refreshing the page clears all data.</p>
-        </section>
-
-        <section class="card">
-          <h2><span class="icon">≡</span> Try these inputs</h2>
-          <div class="kbd-row">
-            <kbd>1</kbd><kbd>101</kbd><kbd>Rice</kbd><kbd>Grains</kbd><kbd>250.50</kbd><kbd>20</kbd>
-          </div>
-          <p class="muted">
-            Add a product, then try <kbd>5</kbd> to sell 3 units and <kbd>7</kbd> for the report.
-            Enter <kbd>abc</kbd> at a price or quantity prompt to see validation in action.
-          </p>
-        </section>
-      </aside>
     </main>
 
     <footer class="page-foot">
@@ -633,15 +1179,46 @@
       "use strict";
 
       /* ------------------------------------------------------------------
+       * Sample dataset — mirrors the README examples so the dashboard is
+       * useful immediately. Sales are seeded with their historical category.
+       * ------------------------------------------------------------------ */
+      const LOW_STOCK_THRESHOLD = 5;
+      const MAX_OUTPUT_CHARS = 240000;
+      const KEEP_OUTPUT_CHARS = 200000;
+
+      const SEED_PRODUCTS = [
+        { id: "101", name: "Rice", category: "Grains", price: 250.5, stock: 17 },
+        { id: "102", name: "Milk Pack", category: "Dairy", price: 180, stock: 6 },
+        { id: "103", name: "Sugar", category: "Grocery", price: 120.25, stock: 3 },
+        { id: "104", name: "Green Tea", category: "Beverages", price: 450, stock: 1 },
+        { id: "105", name: "Bread", category: "Bakery", price: 90, stock: 15 },
+        { id: "106", name: "Eggs (Dozen)", category: "Dairy", price: 320, stock: 12 },
+        { id: "107", name: "Cooking Oil", category: "Grocery", price: 640, stock: 5 },
+        { id: "108", name: "Orange Juice", category: "Beverages", price: 210, stock: 0 }
+      ];
+
+      const SEED_SALES = [
+        { id: "101", name: "Rice", category: "Grains", quantity: 3, total: 751.5 },
+        { id: "102", name: "Milk Pack", category: "Dairy", quantity: 2, total: 360 },
+        { id: "104", name: "Green Tea", category: "Beverages", quantity: 1, total: 450 },
+        { id: "107", name: "Cooking Oil", category: "Grocery", quantity: 1, total: 640 }
+      ];
+
+      /* ------------------------------------------------------------------
        * State — mirrors the Python program's products / sales_records lists
        * ------------------------------------------------------------------ */
       let products = [];
       let salesRecords = [];
+      let productById = new Map();
       let state = "menu";
       let pending = {};
       let promptText = "Enter your choice: ";
       let autoplay = false;
       let runToken = 0;
+      let analyticsFrame = 0;
+      let analyticsDirty = true;
+      let latestAnalytics = null;
+      let tableQuery = "";
 
       const output = document.getElementById("output");
       const input = document.getElementById("command-input");
@@ -649,23 +1226,58 @@
       const form = document.getElementById("input-form");
       const sendBtn = document.getElementById("send-btn");
       const demoBtn = document.getElementById("demo-btn");
-      const restartBtn = document.getElementById("restart-btn");
+      const resetBtn = document.getElementById("reset-btn");
+      const clearBtn = document.getElementById("clear-btn");
       const menuButtons = Array.from(document.querySelectorAll(".menu-btn"));
+      const menuGrid = document.getElementById("menu-grid");
       const livePill = document.getElementById("live-pill");
-      const statProducts = document.getElementById("stat-products");
-      const statStock = document.getElementById("stat-stock");
-      const statSales = document.getElementById("stat-sales");
-      const statRevenue = document.getElementById("stat-revenue");
+
+      const datasetBadge = document.getElementById("dataset-badge");
+      const datasetSummary = document.getElementById("dataset-summary");
+      const analyticsSub = document.getElementById("analytics-sub");
+      const analyticsLiveTag = document.getElementById("analytics-live-tag");
+      const analyticsLowTag = document.getElementById("analytics-low-tag");
+      const kpiGrid = document.getElementById("kpi-grid");
+      const insightStrip = document.getElementById("insight-strip");
+      const categoryChart = document.getElementById("category-chart");
+      const topSellers = document.getElementById("top-sellers");
+      const stockWatch = document.getElementById("stock-watch");
+      const tableCount = document.getElementById("table-count");
+      const tableFilter = document.getElementById("table-filter");
+      const productRows = document.getElementById("product-rows");
+      const productTotals = document.getElementById("product-totals");
+
+      let outputNode = null;
 
       const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
       /* ------------------------------------------------------------------
-       * Output helpers
+       * Formatting + output helpers
        * ------------------------------------------------------------------ */
       function print() {
         const text = Array.prototype.slice.call(arguments).join(" ");
-        output.textContent += text + "\n";
-        output.scrollTop = output.scrollHeight;
+        const nearBottom =
+          output.scrollHeight - output.scrollTop - output.clientHeight < 80;
+
+        outputNode.appendData(text + "\n");
+
+        // Keep very long sessions bounded without re-serialising the log.
+        if (outputNode.length > MAX_OUTPUT_CHARS) {
+          outputNode.data =
+            "\n… earlier output trimmed …\n" +
+            outputNode.data.slice(-KEEP_OUTPUT_CHARS);
+        }
+
+        if (nearBottom || autoplay) {
+          output.scrollTop = output.scrollHeight;
+        }
+      }
+
+      function resetOutput() {
+        output.replaceChildren();
+        outputNode = document.createTextNode("");
+        output.appendChild(outputNode);
+        output.scrollTop = 0;
       }
 
       // Python prints floats like 250.5 and 250.0 (not 250).
@@ -675,9 +1287,47 @@
         return String(value);
       }
 
-      function revenueText() {
-        if (salesRecords.length === 0) return "0";
-        return pyFloat(salesRecords.reduce((sum, sale) => sum + sale.total, 0));
+      function money(value) {
+        const safe = Number.isFinite(value) ? value : 0;
+        return (
+          "Rs. " +
+          safe.toLocaleString("en-US", {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+          })
+        );
+      }
+
+      function number(value) {
+        return value.toLocaleString("en-US");
+      }
+
+      function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, function (character) {
+          return {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+          }[character];
+        });
+      }
+
+      function percent(part, whole) {
+        if (!whole) return 0;
+        return (part / whole) * 100;
+      }
+
+      function barWidth(value, max) {
+        if (!max || value <= 0) return 0;
+        return Math.max(3, Math.round((value / max) * 100));
+      }
+
+      function stockStatus(stock) {
+        if (stock === 0) return { label: "Out of stock", className: "out" };
+        if (stock < LOW_STOCK_THRESHOLD) return { label: "Low stock", className: "low" };
+        return { label: "In stock", className: "ok" };
       }
 
       function setPrompt(text, placeholder) {
@@ -696,24 +1346,482 @@
         }
       }
 
-      function syncStats() {
-        const totalStock = products.reduce((sum, product) => sum + product.stock, 0);
-        statProducts.textContent = String(products.length);
-        statStock.textContent = String(totalStock);
-        statSales.textContent = String(salesRecords.length);
-        statRevenue.textContent = "Rs. " + revenueText();
+      /* ------------------------------------------------------------------
+       * Data index + analytics scheduling
+       * ------------------------------------------------------------------ */
+      function rebuildProductIndex() {
+        productById = new Map(products.map((product) => [product.id, product]));
       }
 
-      function syncControls() {
-        const onMenu = state === "menu" && !autoplay;
-        menuButtons.forEach((button) => {
-          button.disabled = !onMenu;
+      function findProduct(id) {
+        return productById.get(id);
+      }
+
+      function markDataChanged() {
+        rebuildProductIndex();
+        scheduleAnalytics();
+      }
+
+      function scheduleAnalytics() {
+        analyticsDirty = true;
+        if (analyticsFrame) return;
+
+        analyticsFrame = requestAnimationFrame(function () {
+          analyticsFrame = 0;
+          if (!analyticsDirty) return;
+          analyticsDirty = false;
+          latestAnalytics = computeAnalytics();
+          paintAnalytics(latestAnalytics);
         });
-        demoBtn.disabled = autoplay;
-        input.disabled = autoplay || state === "exit";
-        sendBtn.disabled = autoplay || state === "exit";
-        livePill.textContent = autoplay ? "demo" : "live";
-        livePill.style.opacity = autoplay ? "0.7" : "1";
+      }
+
+      function flushAnalytics() {
+        if (analyticsFrame) {
+          cancelAnimationFrame(analyticsFrame);
+          analyticsFrame = 0;
+        }
+        analyticsDirty = false;
+        latestAnalytics = computeAnalytics();
+        paintAnalytics(latestAnalytics);
+      }
+
+      function computeAnalytics() {
+        const totalStock = products.reduce((sum, product) => sum + product.stock, 0);
+        const inventoryValue = products.reduce(
+          (sum, product) => sum + product.stock * product.price,
+          0
+        );
+        const unitsSold = salesRecords.reduce((sum, sale) => sum + sale.quantity, 0);
+        const revenue = salesRecords.reduce((sum, sale) => sum + sale.total, 0);
+
+        const categoryNames = new Set();
+        const categoryMap = new Map();
+
+        products.forEach((product) => {
+          categoryNames.add(product.category);
+          if (!categoryMap.has(product.category)) {
+            categoryMap.set(product.category, {
+              name: product.category,
+              products: 0,
+              stock: 0,
+              revenue: 0,
+              units: 0
+            });
+          }
+          const entry = categoryMap.get(product.category);
+          entry.products += 1;
+          entry.stock += product.stock;
+        });
+
+        const sellerMap = new Map();
+
+        salesRecords.forEach((sale) => {
+          const product = productById.get(sale.id);
+          const category = sale.category || (product && product.category) || "Other";
+
+          if (!categoryMap.has(category)) {
+            categoryMap.set(category, {
+              name: category,
+              products: 0,
+              stock: 0,
+              revenue: 0,
+              units: 0
+            });
+          }
+          const categoryEntry = categoryMap.get(category);
+          categoryEntry.revenue += sale.total;
+          categoryEntry.units += sale.quantity;
+
+          const sellerKey = sale.id || sale.name;
+          if (!sellerMap.has(sellerKey)) {
+            sellerMap.set(sellerKey, {
+              id: sale.id,
+              name: sale.name,
+              category: category,
+              quantity: 0,
+              revenue: 0
+            });
+          }
+          const seller = sellerMap.get(sellerKey);
+          seller.quantity += sale.quantity;
+          seller.revenue += sale.total;
+        });
+
+        const categoryRevenue = Array.from(categoryMap.values())
+          .filter((category) => category.revenue > 0)
+          .sort((a, b) => b.revenue - a.revenue);
+
+        const sellerList = Array.from(sellerMap.values());
+        const topSellersByRevenue = sellerList
+          .slice()
+          .sort((a, b) => b.revenue - a.revenue)
+          .slice(0, 5);
+        const bestSeller = sellerList
+          .slice()
+          .sort((a, b) => b.quantity - a.quantity || b.revenue - a.revenue)[0];
+
+        const lowStock = products
+          .filter((product) => product.stock > 0 && product.stock < LOW_STOCK_THRESHOLD)
+          .sort((a, b) => a.stock - b.stock || a.name.localeCompare(b.name));
+        const outOfStock = products.filter((product) => product.stock === 0);
+        const needsAttention = products
+          .filter((product) => product.stock < LOW_STOCK_THRESHOLD)
+          .sort((a, b) => a.stock - b.stock || a.name.localeCompare(b.name));
+
+        const highestPrice = products.length
+          ? Math.max.apply(null, products.map((product) => product.price))
+          : 0;
+        const highestPriceProducts = products.filter(
+          (product) => product.price === highestPrice
+        );
+
+        return {
+          totalStock: totalStock,
+          inventoryValue: inventoryValue,
+          unitsSold: unitsSold,
+          revenue: revenue,
+          categoryCount: categoryNames.size,
+          categoryRevenue: categoryRevenue,
+          topSellers: topSellersByRevenue,
+          bestSeller: bestSeller,
+          lowStock: lowStock,
+          outOfStock: outOfStock,
+          needsAttention: needsAttention,
+          highestPrice: highestPrice,
+          highestPriceProducts: highestPriceProducts,
+          averageSale: salesRecords.length ? revenue / salesRecords.length : 0,
+          averageUnitValue: totalStock ? inventoryValue / totalStock : 0,
+          topCategory: categoryRevenue[0] || null
+        };
+      }
+
+      /* ------------------------------------------------------------------
+       * Analytics rendering — one paint per data change
+       * ------------------------------------------------------------------ */
+      function paintAnalytics(analytics) {
+        const time = new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit"
+        });
+
+        datasetBadge.textContent =
+          products.length > 0
+            ? products.length + " products · " + salesRecords.length + " sales loaded"
+            : "Empty store · Python parity";
+
+        analyticsSub.textContent =
+          products.length > 0
+            ? products.length +
+              " products across " +
+              analytics.categoryCount +
+              " categories · " +
+              salesRecords.length +
+              " sales recorded · updated " +
+              time
+            : "No products yet — add one in the terminal or reload the sample dataset.";
+
+        analyticsLowTag.textContent =
+          analytics.needsAttention.length === 0
+            ? "all stock healthy"
+            : analytics.needsAttention.length + " need restocking";
+        analyticsLowTag.className =
+          "tag " + (analytics.needsAttention.length === 0 ? "green" : "amber");
+        analyticsLiveTag.textContent =
+          products.length > 0 || salesRecords.length > 0 ? "● auto-updates" : "○ waiting for data";
+
+        datasetSummary.innerHTML =
+          products.length > 0
+            ? "<span><b>" +
+              products.length +
+              "</b> products · <b>" +
+              salesRecords.length +
+              "</b> sales</span><span>Sample data preloaded</span>"
+            : "<span><b>0</b> products · <b>0</b> sales</span><span>Empty store · Python parity</span>";
+
+        paintKpis(analytics);
+        paintInsights(analytics);
+        paintCategoryChart(analytics);
+        paintTopSellers(analytics);
+        paintStockWatch(analytics);
+        renderProductTable(analytics);
+      }
+
+      function paintKpis(analytics) {
+        const lowCount = analytics.needsAttention.length;
+        const outCount = analytics.outOfStock.length;
+
+        kpiGrid.innerHTML =
+          kpi("Products", number(products.length), analytics.categoryCount + " categories", "green") +
+          kpi("Revenue", money(analytics.revenue), salesRecords.length ? "avg " + money(analytics.averageSale) + " per sale" : "no sales yet", "blue") +
+          kpi("Sales", number(salesRecords.length), analytics.unitsSold + " units sold", "violet") +
+          kpi("Units in stock", number(analytics.totalStock), lowCount + " low · " + outCount + " out", "green") +
+          kpi("Inventory value", money(analytics.inventoryValue), "avg " + money(analytics.averageUnitValue) + " per unit", "amber") +
+          kpi("Low stock", number(lowCount), outCount + " out of stock", lowCount ? "red" : "green");
+      }
+
+      function kpi(label, value, sub, tone) {
+        return (
+          '<article class="kpi ' +
+          tone +
+          '"><span class="kpi-label">' +
+          label +
+          '</span><strong class="kpi-value">' +
+          escapeHtml(value) +
+          '</strong><span class="kpi-sub">' +
+          escapeHtml(sub) +
+          "</span></article>"
+        );
+      }
+
+      function paintInsights(analytics) {
+        const best = analytics.bestSeller;
+        const topCategory = analytics.topCategory;
+        const highest = analytics.highestPrice;
+        const highestNames = analytics.highestPriceProducts
+          .slice(0, 2)
+          .map((product) => product.name)
+          .join(", ");
+
+        insightStrip.innerHTML =
+          insight(
+            "Best seller",
+            best ? escapeHtml(best.name) : "No sales yet",
+            best ? best.quantity + " units · " + money(best.revenue) : "Sell a product to populate",
+            "green"
+          ) +
+          insight(
+            "Top category",
+            topCategory ? escapeHtml(topCategory.name) : "No revenue yet",
+            topCategory ? money(topCategory.revenue) + " from " + topCategory.units + " units" : "Category revenue appears here",
+            "blue"
+          ) +
+          insight(
+            "Highest price",
+            highestNames ? escapeHtml(highestNames) : "No products yet",
+            highestNames ? money(highest) + " per unit" : "Add a product to compare prices",
+            "violet"
+          ) +
+          insight(
+            "Stock health",
+            analytics.needsAttention.length
+              ? analytics.needsAttention.length + " need attention"
+              : "All stock healthy",
+            analytics.outOfStock.length
+              ? analytics.outOfStock.length + " out of stock"
+              : "No items are out of stock",
+            analytics.needsAttention.length ? "amber" : "green"
+          );
+      }
+
+      function insight(label, value, sub, tone) {
+        return (
+          '<div class="insight ' +
+          tone +
+          '"><span>' +
+          label +
+          "</span><strong>" +
+          value +
+          "</strong><em>" +
+          escapeHtml(sub) +
+          "</em></div>"
+        );
+      }
+
+      function paintCategoryChart(analytics) {
+        if (analytics.categoryRevenue.length === 0) {
+          categoryChart.innerHTML =
+            '<p class="empty-note">No sales recorded yet. Process a sale to see revenue split by category.</p>';
+          return;
+        }
+
+        const max = analytics.categoryRevenue[0].revenue;
+
+        categoryChart.innerHTML = analytics.categoryRevenue
+          .slice(0, 6)
+          .map(function (category) {
+            const share = percent(category.revenue, analytics.revenue);
+            return (
+              '<div class="bar-row">' +
+              '<div class="bar-top"><span class="bar-name">' +
+              escapeHtml(category.name) +
+              '</span><span class="bar-val">' +
+              money(category.revenue) +
+              "</span></div>" +
+              '<div class="bar-track"><span class="bar-fill" style="width:' +
+              barWidth(category.revenue, max) +
+              '%"></span></div>' +
+              '<div class="bar-sub"><span>' +
+              category.units +
+              " units sold</span><span>" +
+              share.toFixed(1) +
+              "% of revenue</span></div>" +
+              "</div>"
+            );
+          })
+          .join("");
+      }
+
+      function paintTopSellers(analytics) {
+        if (analytics.topSellers.length === 0) {
+          topSellers.innerHTML =
+            '<p class="empty-note">No sales yet. Completed sales are ranked here by revenue.</p>';
+          return;
+        }
+
+        const max = analytics.topSellers[0].revenue;
+
+        topSellers.innerHTML = analytics.topSellers
+          .map(function (seller, index) {
+            return (
+              '<div class="seller-row">' +
+              '<span class="rank">' +
+              (index + 1) +
+              "</span>" +
+              '<div class="seller-main">' +
+              '<div class="seller-top"><b>' +
+              escapeHtml(seller.name) +
+              "</b><span>" +
+              money(seller.revenue) +
+              "</span></div>" +
+              '<div class="bar-track"><span class="bar-fill blue" style="width:' +
+              barWidth(seller.revenue, max) +
+              '%"></span></div>' +
+              '<div class="seller-meta"><span>' +
+              seller.quantity +
+              " units sold</span><span>" +
+              escapeHtml(seller.category) +
+              "</span></div>" +
+              "</div></div>"
+            );
+          })
+          .join("");
+      }
+
+      function paintStockWatch(analytics) {
+        if (products.length === 0) {
+          stockWatch.innerHTML =
+            '<p class="empty-note">No products in the store. Add one to start monitoring stock.</p>';
+          return;
+        }
+
+        if (analytics.needsAttention.length === 0) {
+          stockWatch.innerHTML =
+            '<p class="empty-note">All ' +
+            products.length +
+            " products have " +
+            LOW_STOCK_THRESHOLD +
+            " or more units in stock.</p>";
+          return;
+        }
+
+        stockWatch.innerHTML = analytics.needsAttention
+          .map(function (product) {
+            const status = stockStatus(product.stock);
+            return (
+              '<div class="watch-row">' +
+              '<div class="watch-main"><b>' +
+              escapeHtml(product.name) +
+              "</b><span>" +
+              escapeHtml(product.category) +
+              " · " +
+              money(product.price) +
+              "</span></div>" +
+              '<span class="watch-stock">' +
+              product.stock +
+              "</span>" +
+              '<span class="status-pill ' +
+              status.className +
+              '">' +
+              (product.stock === 0 ? "Out" : "Low") +
+              "</span></div>"
+            );
+          })
+          .join("");
+      }
+
+      function renderProductTable(analytics) {
+        const query = tableQuery.toLowerCase();
+        const rows = products.filter(function (product) {
+          if (!query) return true;
+          return (
+            product.id.toLowerCase().indexOf(query) !== -1 ||
+            product.name.toLowerCase().indexOf(query) !== -1 ||
+            product.category.toLowerCase().indexOf(query) !== -1
+          );
+        });
+
+        tableCount.textContent = query
+          ? rows.length + " of " + products.length + " products"
+          : products.length + (products.length === 1 ? " product" : " products");
+
+        if (rows.length === 0) {
+          productRows.innerHTML =
+            '<tr><td class="empty-cell" colspan="7">' +
+            (products.length === 0
+              ? "No products in the store. Add one in the terminal or reload the sample dataset."
+              : "No products match “" + escapeHtml(tableQuery) + "”.") +
+            "</td></tr>";
+          productTotals.innerHTML = "";
+          return;
+        }
+
+        productRows.innerHTML = rows
+          .map(function (product) {
+            const status = stockStatus(product.stock);
+            return (
+              "<tr>" +
+              '<td class="id">' +
+              escapeHtml(product.id) +
+              "</td>" +
+              '<td class="product">' +
+              escapeHtml(product.name) +
+              "</td>" +
+              '<td class="category">' +
+              escapeHtml(product.category) +
+              "</td>" +
+              '<td class="num">' +
+              money(product.price) +
+              "</td>" +
+              '<td class="num stock ' +
+              status.className +
+              '">' +
+              product.stock +
+              "</td>" +
+              '<td class="num value">' +
+              money(product.stock * product.price) +
+              "</td>" +
+              '<td><span class="status-pill ' +
+              status.className +
+              '">' +
+              status.label +
+              "</span></td>" +
+              "</tr>"
+            );
+          })
+          .join("");
+
+        const shownStock = rows.reduce((sum, product) => sum + product.stock, 0);
+        const shownValue = rows.reduce(
+          (sum, product) => sum + product.stock * product.price,
+          0
+        );
+        const averagePrice =
+          rows.reduce((sum, product) => sum + product.price, 0) / rows.length;
+
+        productTotals.innerHTML =
+          '<tr><td colspan="3">Totals · ' +
+          rows.length +
+          " shown</td>" +
+          '<td class="num">avg ' +
+          money(averagePrice) +
+          "</td>" +
+          '<td class="num">' +
+          number(shownStock) +
+          " units</td>" +
+          '<td class="num">' +
+          money(shownValue) +
+          '</td><td><span class="status-pill ok">Live</span></td></tr>';
       }
 
       /* ------------------------------------------------------------------
@@ -741,10 +1849,6 @@
         setPrompt("Enter your choice: ");
       }
 
-      function toMenu() {
-        showMenu();
-      }
-
       function isDigits(value) {
         return /^[0-9]+$/.test(value);
       }
@@ -760,7 +1864,7 @@
         if (products.length === 0) {
           print("No products available.");
         } else {
-          products.forEach((product) => {
+          products.forEach(function (product) {
             print("\nProduct ID:", product.id);
             print("Product Name:", product.name);
             print("Category:", product.category);
@@ -768,7 +1872,7 @@
             print("Available Stock:", product.stock);
           });
         }
-        toMenu();
+        showMenu();
       }
 
       function viewSales() {
@@ -776,31 +1880,35 @@
         if (salesRecords.length === 0) {
           print("No sales records available.");
         } else {
-          salesRecords.forEach((sale) => {
+          salesRecords.forEach(function (sale) {
             print("\nProduct ID:", sale.id);
             print("Product Name:", sale.name);
             print("Quantity Sold:", sale.quantity);
             print("Total Amount: Rs.", pyFloat(sale.total));
           });
         }
-        toMenu();
+        showMenu();
       }
 
       function generateReport() {
         print("\n========== STORE REPORT ==========");
 
         const totalStock = products.reduce((sum, product) => sum + product.stock, 0);
+        const revenue = salesRecords.reduce((sum, sale) => sum + sale.total, 0);
+
         print("Total Products:", products.length);
         print("Total Available Stock:", totalStock);
         print("Total Sales Transactions:", salesRecords.length);
-        print("Total Revenue: Rs.", revenueText());
+        print("Total Revenue: Rs.", pyFloat(revenue));
 
         print("\nProducts with Low Stock:");
-        const lowStock = products.filter((product) => product.stock < 5);
+        const lowStock = products.filter(
+          (product) => product.stock < LOW_STOCK_THRESHOLD
+        );
         if (lowStock.length === 0) {
           print("No products with low stock.");
         } else {
-          lowStock.forEach((product) => {
+          lowStock.forEach(function (product) {
             print(product.name, "-", product.stock, "units");
           });
         }
@@ -813,14 +1921,14 @@
           print("\nProduct with Highest Price:");
           products
             .filter((product) => product.price === highestPrice)
-            .forEach((product) => {
+            .forEach(function (product) {
               print(product.name, "- Rs.", pyFloat(product.price));
             });
 
           print("\nProduct with Lowest Price:");
           products
             .filter((product) => product.price === lowestPrice)
-            .forEach((product) => {
+            .forEach(function (product) {
               print(product.name, "- Rs.", pyFloat(product.price));
             });
         } else {
@@ -828,17 +1936,16 @@
         }
 
         print("==================================");
-        toMenu();
+        showMenu();
       }
 
       function exitProgram() {
         print("\nThank you for using Smart Grocery Store System!");
         state = "exit";
-        setPrompt("", "Session ended — click Restart demo");
+        setPrompt("", "Session ended — reload the demo to continue");
         promptLabel.textContent = "";
         input.disabled = true;
         sendBtn.disabled = true;
-        syncStats();
         syncControls();
       }
 
@@ -849,9 +1956,7 @@
         print(promptText + raw);
         input.value = "";
 
-        const currentState = state;
-
-        switch (currentState) {
+        switch (state) {
           /* ----------------------------- Main menu ----------------------------- */
           case "menu": {
             if (raw === "1") {
@@ -881,16 +1986,16 @@
               exitProgram();
             } else {
               print("Invalid choice! Please select between 1 and 8.");
-              toMenu();
+              showMenu();
             }
             break;
           }
 
           /* ----------------------------- Add product --------------------------- */
           case "add_id": {
-            if (products.some((product) => product.id === raw)) {
+            if (findProduct(raw)) {
               print("Product ID already exists!");
-              toMenu();
+              showMenu();
               break;
             }
             pending.id = raw;
@@ -931,17 +2036,17 @@
               setPrompt("Enter available stock: ");
               break;
             }
-            const newProduct = {
+            products.push({
               id: pending.id,
               name: pending.name,
               category: pending.category,
               price: pending.price,
               stock: parseInt(raw, 10)
-            };
-            products.push(newProduct);
+            });
             print("\nProduct added successfully!");
             pending = {};
-            toMenu();
+            markDataChanged();
+            showMenu();
             break;
           }
 
@@ -949,7 +2054,7 @@
           case "search_value": {
             const searchValue = raw.trim();
             let found = false;
-            products.forEach((product) => {
+            products.forEach(function (product) {
               if (
                 product.id === searchValue ||
                 product.name.toLowerCase() === searchValue.toLowerCase()
@@ -964,16 +2069,16 @@
               }
             });
             if (!found) print("Product not found.");
-            toMenu();
+            showMenu();
             break;
           }
 
           /* ----------------------------- Update stock -------------------------- */
           case "update_id": {
-            const product = products.find((item) => item.id === raw);
+            const product = findProduct(raw);
             if (!product) {
               print("Product not found.");
-              toMenu();
+              showMenu();
               break;
             }
             pending.product = product;
@@ -991,11 +2096,13 @@
             if (raw === "1" || raw === "2") {
               pending.mode = raw;
               state = "update_quantity";
-              setPrompt(raw === "1" ? "Enter quantity to add: " : "Enter new stock quantity: ");
+              setPrompt(
+                raw === "1" ? "Enter quantity to add: " : "Enter new stock quantity: "
+              );
               break;
             }
             print("Invalid choice!");
-            toMenu();
+            showMenu();
             break;
           }
 
@@ -1010,20 +2117,21 @@
                 product.stock = quantity;
                 print("Stock updated successfully!");
               }
+              markDataChanged();
             } else {
               print("Invalid quantity!");
             }
             print("Updated Stock:", product.stock);
-            toMenu();
+            showMenu();
             break;
           }
 
           /* ----------------------------- Process sale -------------------------- */
           case "sale_id": {
-            const product = products.find((item) => item.id === raw);
+            const product = findProduct(raw);
             if (!product) {
               print("Product not found.");
-              toMenu();
+              showMenu();
               break;
             }
             pending.product = product;
@@ -1040,7 +2148,7 @@
 
             if (!isDigits(raw)) {
               print("Invalid quantity! Enter numbers only.");
-              toMenu();
+              showMenu();
               break;
             }
 
@@ -1054,6 +2162,7 @@
               salesRecords.push({
                 id: product.id,
                 name: product.name,
+                category: product.category,
                 quantity: quantity,
                 total: totalAmount
               });
@@ -1062,48 +2171,85 @@
               print("Quantity Sold:", quantity);
               print("Total Amount: Rs.", pyFloat(totalAmount));
               print("Remaining Stock:", product.stock);
+              markDataChanged();
             } else {
               print("Insufficient stock!");
               print("Available Stock:", product.stock);
             }
 
-            toMenu();
+            showMenu();
             break;
           }
 
           default:
-            toMenu();
+            showMenu();
         }
 
-        syncStats();
         syncControls();
         focusInput();
+      }
+
+      function syncControls() {
+        const onMenu = state === "menu" && !autoplay;
+        menuButtons.forEach(function (button) {
+          button.disabled = !onMenu;
+        });
+        demoBtn.disabled = autoplay;
+        resetBtn.disabled = false;
+        clearBtn.disabled = false;
+        input.disabled = autoplay || state === "exit";
+        sendBtn.disabled = autoplay || state === "exit";
+        livePill.textContent = autoplay ? "demo" : state === "exit" ? "ended" : "live";
+        livePill.style.opacity = autoplay ? "0.7" : "1";
       }
 
       /* ------------------------------------------------------------------
        * Demo controls
        * ------------------------------------------------------------------ */
-      function resetDemo() {
+      function beginSession() {
+        state = "menu";
+        pending = {};
+        promptLabel.textContent = "Enter your choice: ";
+        promptText = "Enter your choice: ";
+        input.value = "";
+        input.disabled = false;
+        sendBtn.disabled = false;
+        resetOutput();
+        showBanner();
+        showMenu();
+        syncControls();
+        flushAnalytics();
+        focusInput();
+      }
+
+      function loadSampleData() {
+        runToken += 1;
+        autoplay = false;
+        products = SEED_PRODUCTS.map(function (product) {
+          return Object.assign({}, product);
+        });
+        salesRecords = SEED_SALES.map(function (sale) {
+          return Object.assign({}, sale);
+        });
+        tableQuery = "";
+        tableFilter.value = "";
+        rebuildProductIndex();
+        beginSession();
+      }
+
+      function clearStore() {
         runToken += 1;
         autoplay = false;
         products = [];
         salesRecords = [];
-        pending = {};
-        state = "menu";
-        output.textContent = "";
-        input.value = "";
-        input.disabled = false;
-        sendBtn.disabled = false;
-
-        showBanner();
-        showMenu();
-        syncStats();
-        syncControls();
-        focusInput();
+        tableQuery = "";
+        tableFilter.value = "";
+        rebuildProductIndex();
+        beginSession();
       }
 
-      async function runSampleDemo() {
-        resetDemo();
+      async function runGuidedDemo() {
+        loadSampleData();
         const token = runToken;
         autoplay = true;
         syncControls();
@@ -1111,27 +2257,25 @@
 
         const steps = [
           ["1", 520],
-          ["101", 260],
-          ["Rice", 240],
-          ["Grains", 240],
-          ["250.50", 300],
-          ["20", 280],
-          ["2", 620],
-          ["3", 320],
-          ["rice", 320],
-          ["5", 380],
-          ["101", 260],
-          ["3", 300],
-          ["6", 520],
+          ["201", 220],
+          ["Organic Honey", 240],
+          ["Pantry", 220],
+          ["850", 260],
+          ["10", 260],
+          ["5", 360],
+          ["201", 220],
+          ["2", 300],
           ["7", 900],
-          ["8", 700]
+          ["6", 700]
         ];
 
         await sleep(600);
         if (token !== runToken) return;
 
-        for (const [value, pause] of steps) {
+        for (const step of steps) {
           if (token !== runToken) return;
+          const value = step[0];
+          const pause = step[1];
 
           for (const character of value) {
             if (token !== runToken) return;
@@ -1148,6 +2292,7 @@
         if (token !== runToken) return;
         autoplay = false;
         syncControls();
+        focusInput();
       }
 
       /* ------------------------------------------------------------------
@@ -1159,23 +2304,29 @@
         handleInput(input.value);
       });
 
-      menuButtons.forEach((button) => {
-        button.addEventListener("click", function () {
-          if (state !== "menu" || autoplay) return;
-          handleInput(button.getAttribute("data-choice"));
-        });
+      // One delegated listener instead of eight per-button listeners.
+      menuGrid.addEventListener("click", function (event) {
+        const button = event.target.closest("button[data-choice]");
+        if (!button || state !== "menu" || autoplay) return;
+        handleInput(button.getAttribute("data-choice"));
       });
 
-      demoBtn.addEventListener("click", runSampleDemo);
-      restartBtn.addEventListener("click", resetDemo);
+      demoBtn.addEventListener("click", runGuidedDemo);
+      resetBtn.addEventListener("click", loadSampleData);
+      clearBtn.addEventListener("click", clearStore);
+
+      tableFilter.addEventListener("input", function () {
+        tableQuery = tableFilter.value.trim();
+        if (latestAnalytics) renderProductTable(latestAnalytics);
+      });
 
       // Keep the prompt visible when the user clicks anywhere in the terminal.
       document.querySelector(".terminal").addEventListener("click", function (event) {
-        if (event.target.closest("a, button")) return;
+        if (event.target.closest("a, button, input")) return;
         focusInput();
       });
 
-      resetDemo();
+      loadSampleData();
     })();
   </script>
 </body>

@@ -1,4 +1,4 @@
-![Smart Grocery Store Management System banner](images/00-banner.png)
+![Smart Grocery Store Management System banner](assets/00-banner.png)
 
 # Smart Grocery Store Management System
 
@@ -6,14 +6,15 @@
 
 A complete beginner Python project that runs a small grocery store from the terminal. Products are
 stored as dictionaries inside a list, sales are recorded in a second list, and a `while True` loop keeps
-the menu running until the user exits. The repository also includes a self-contained browser demo that
-mirrors the same menu, validation, and report logic.
+the menu running until the user exits. The repository also includes a self-contained browser demo with
+a preloaded sample catalog and a live analytics dashboard that mirrors the same menu, validation, and
+report logic.
 
 | Part | File | Purpose |
 |---|---|---|
 | Python application | `smart_store_management.py` | Full console program with 7 functions and 8 menu options |
 | Browser demo | `index.html` | Interactive demo of the same flows, with no Python installation required |
-| Documentation | `README.md` + `images/` | Overview, diagrams, run instructions, sample session, and tests |
+| Documentation | `README.md` + `assets/` | Overview, diagrams, run instructions, sample session, and tests |
 
 **Quick links:** [Project structure](#1-project-structure) ·
 [How to run](#3-requirements-and-how-to-run) ·
@@ -42,14 +43,14 @@ mirrors the same menu, validation, and report logic.
 
 ## 1. Project structure
 
-![Project structure](images/01-project-structure.png)
+![Project structure](assets/01-project-structure.png)
 
 ```text
 smart-grocery-store-management-system/
 ├── smart_store_management.py   # main console program
 ├── index.html                  # interactive browser demo
 ├── README.md                   # this documentation
-├── images/                     # diagrams, charts and screenshots
+├── assets/                     # diagrams, charts and screenshots
 │   ├── 00-banner.png
 │   ├── 01-project-structure.png
 │   ├── 02-program-flow.png
@@ -64,7 +65,7 @@ smart-grocery-store-management-system/
 ```
 
 Only `smart_store_management.py` is required to run the Python program. `index.html` is optional and
-provides the browser-based demo. The `images/` folder is used only by this README.
+provides the browser-based demo. The `assets/` folder is used only by this README.
 
 ---
 
@@ -128,14 +129,15 @@ python -m http.server 8000
 
 Then open <http://localhost:8000/index.html>.
 
-> **Data note:** Both versions keep everything in memory. Closing the Python program, refreshing the
-> browser page, or clicking **Restart demo** clears all products and sales.
+> **Data note:** Both versions keep everything in memory. Closing the Python program resets its empty
+> lists, refreshing the browser page reloads the sample dataset, and **Clear all data** empties the
+> browser demo without a reload.
 
 ---
 
 ## 4. Program walkthrough
 
-![Program flow](images/02-program-flow.png)
+![Program flow](assets/02-program-flow.png)
 
 The Python file has three logical parts: two lists, seven functions, and one menu loop.
 
@@ -193,7 +195,7 @@ Only option `8` breaks the loop.
 
 ## 5. Data model
 
-![Data model](images/03-data-model.png)
+![Data model](assets/03-data-model.png)
 
 ### Products
 
@@ -238,7 +240,7 @@ operation.
 
 ## 6. Validation and error prevention
 
-![Validation and error prevention](images/05-validation-flow.png)
+![Validation and error prevention](assets/05-validation-flow.png)
 
 Every input is checked before it is stored. Invalid input is explained and either retried or blocked.
 
@@ -271,7 +273,7 @@ Every input is checked before it is stored. Invalid input is explained and eithe
 
 ## 7. Python concepts used
 
-![Python concepts used](images/04-concepts-map.png)
+![Python concepts used](assets/04-concepts-map.png)
 
 | Concept | Where it appears | Example from the program |
 |---|---|---|
@@ -302,7 +304,7 @@ read and explained line by line.
 
 ## 8. Sample run
 
-![Sample session](images/07-sample-session.png)
+![Sample session](assets/07-sample-session.png)
 
 ### 8.1 Products added
 
@@ -349,13 +351,17 @@ Bread - Rs. 90.0
 ==================================
 ```
 
+> The browser demo seeds **4 of these sales** (Rice ×3, Milk Pack ×2, Green Tea ×1, Cooking Oil ×1), so
+> its initial revenue is `Rs. 2,201.5` rather than `Rs. 2,062.5`. Stock and product counts follow the
+> same arithmetic; see [Section 10](#10-interactive-browser-demo) for the exact seed values.
+
 The same data is visualised in the next section.
 
 ---
 
 ## 9. Store report explained
 
-![Store report snapshot](images/06-store-report.png)
+![Store report snapshot](assets/06-store-report.png)
 
 | Report line | How it is calculated | Sample value |
 |---|---|---|
@@ -375,10 +381,16 @@ empty, the report prints `No products available for price comparison.` and the l
 
 ## 10. Interactive Browser Demo
 
-![Interactive browser demo](images/08-browser-demo.png)
+![Interactive browser demo](assets/08-browser-demo.png)
 
 `index.html` recreates the terminal experience in the browser. It is a JavaScript reimplementation, not
 the Python file running in the browser — this keeps it completely self-contained and easy to share.
+
+The demo starts with a **sample dataset of 8 products and 4 sales** so the analytics are populated from
+the first second. The seeded sales are a subset of the session in [Section 8](#8-sample-run) — Rice,
+Milk Pack, Green Tea, and Cooking Oil — which is why its revenue is `Rs. 2,201.5` instead of
+`Rs. 2,062.5`. Use **Clear all data** at any time to start from an empty store, exactly like the
+Python program.
 
 ### Run the demo
 
@@ -406,14 +418,43 @@ https://<your-username>.github.io/smart-grocery-store-management-system/
 ### What the demo includes
 
 - The same 8-option menu, prompts, validation messages, and report calculations.
-- An automated **Run sample demo** button that adds a product, sells 3 units, and generates the report.
+- A preloaded **sample dataset**: 8 products across 5 categories and 4 seeded sales.
+- An automated **Run guided demo** button that adds *Organic Honey*, sells 2 units, and generates the
+  report — ending with 9 products, 5 sales, and Rs. 3,901.5 revenue.
 - **Main menu shortcut** buttons for options `1`–`8`.
-- A **Live store status** panel with product count, units in stock, sales count, and revenue.
-- A **Restart demo** button that clears all data.
+- **Reload sample data** and **Clear all data** controls.
+- A **filterable inventory table** that searches product name, ID, or category.
+
+### Live analytics dashboard
+
+Every add, stock update, and sale recalculates the dashboard in the same animation frame, so the
+numbers always match the terminal output.
+
+| KPI | Calculation | Seed value |
+|---|---|---|
+| Products | `products.length` | `8` |
+| Revenue | Sum of every `sale.total` | `Rs. 2,201.5` |
+| Sales | `salesRecords.length` | `4` |
+| Units in stock | Sum of every `product.stock` | `59` |
+| Inventory value | Sum of `stock × price` | `Rs. 14,539.25` |
+| Low stock | Products with fewer than 5 units | `3` |
+
+The dashboard also includes:
+
+- **Insight strip** — best seller, top category, highest-priced product, and stock health.
+- **Revenue by category** — sorted bars with each category's share of total revenue.
+- **Top sellers** — products ranked by revenue, with units sold and category.
+- **Stock watchlist** — every product below 5 units, including out-of-stock items.
+- **Product inventory table** — price, stock, inventory value, status, and filtered totals.
+
+The demo also keeps the terminal log efficient: output is appended as a text node, long sessions are
+trimmed to a fixed character budget, and analytics are computed once per data change instead of on
+every render.
 
 ### Demo notes
 
-- Data is held in memory only; refreshing the page or restarting clears it.
+- Data is held in memory only. Refreshing the page reloads the sample dataset; **Clear all data** gives
+  the empty-store behaviour of the Python program.
 - All graphics in this README are local files and load without an internet connection.
 - The Python program remains the primary implementation; the browser demo is for presentation.
 
@@ -421,10 +462,10 @@ https://<your-username>.github.io/smart-grocery-store-management-system/
 
 ## 11. Testing summary
 
-![Testing summary](images/09-testing-summary.png)
+![Testing summary](assets/09-testing-summary.png)
 
 23 manual test cases cover the happy paths, validation failures, and empty-state edge cases. The
-browser demo was additionally checked with 30 automated assertions in headless Chrome.
+browser demo was additionally checked with 75 automated assertions in headless Chrome.
 
 | # | Scenario | Input | Expected result |
 |---|---|---|---|
@@ -452,10 +493,28 @@ browser demo was additionally checked with 30 automated assertions in headless C
 | 22 | Invalid menu choice | `0` or `abc` | `Invalid choice! Please select between 1 and 8.` |
 | 23 | Exit the program | `8` | Farewell message and the program ends |
 
-**Automated browser checks:** startup banner and menu, invalid price, duplicate ID, case-insensitive
-search, add stock, invalid sale quantity, insufficient stock, sale total, stock deduction, live stats,
-report totals, low-stock detection, empty catalog, empty sales, empty report, invalid choice, exit
-behaviour, and the full sample demo — **30 assertions passed**.
+**Automated browser checks:** seeded dataset and KPI totals, category revenue, top sellers, stock
+watchlist, table totals and filter, clearing to an empty store, startup banner and menu, invalid price,
+duplicate ID, case-insensitive search, add stock, invalid sale quantity, insufficient stock, sale total,
+stock deduction, guided demo, report totals, low-stock detection, empty catalog, empty sales, empty
+report, exit behaviour, and horizontal-overflow checks at five viewport widths — **75 assertions passed**.
+
+### Seed data verification
+
+| Metric | Expected | Verified |
+|---|---|---|
+| Products / sales | `8` / `4` | ✓ |
+| Categories | `5` (Grains, Dairy, Grocery, Beverages, Bakery) | ✓ |
+| Units in stock | `59` | ✓ |
+| Revenue | `Rs. 2,201.5` | ✓ |
+| Inventory value | `Rs. 14,539.25` | ✓ |
+| Low-stock products | `3` (Sugar 3, Green Tea 1, Orange Juice 0) | ✓ |
+| Category revenue rows | `4` (Grains, Grocery, Dairy, Beverages) | ✓ |
+| Top sellers | `4` | ✓ |
+
+The guided demo adds **Organic Honey** (`201`, `Pantry`, `850`, stock `10`), sells `2` units, and
+finishes with `9` products, `5` sales, and `Rs. 3,901.5` revenue — leaving the session at the main menu
+so the page stays interactive.
 
 ---
 
@@ -471,6 +530,8 @@ behaviour, and the full sample demo — **30 assertions passed**.
 - [x] Sales calculate a total, reduce stock, and save a record
 - [x] Report shows totals, low stock, and highest/lowest prices
 - [x] Browser demo mirrors the Python flows
+- [x] Browser demo ships with a preloaded sample dataset
+- [x] Live analytics dashboard, charts, and filterable inventory table
 - [x] README includes diagrams, charts, and screenshots
 - [x] 23 test cases documented and verified
 
