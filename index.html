@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Grocery Store — Interactive Demo</title>
+  <meta
+    name="description"
+    content="Interactive browser demo of the Smart Grocery Store Management System Python program."
+  />
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #070c15;
+      --panel: #0f1829;
+      --panel-2: #0b1322;
+      --border: #1e2d47;
+      --border-soft: #17243a;
+      --text: #dbe6f5;
+      --muted: #8ea3c2;
+      --accent: #34d399;
+      --accent-soft: rgba(52, 211, 153, 0.12);
+      --accent-2: #38bdf8;
+      --danger: #f87171;
+      --mono: "JetBrains Mono", "Cascadia Code", Consolas, "SFMono-Regular", Menlo, monospace;
+      --sans: "Segoe UI", Inter, system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(900px 500px at 12% -10%, rgba(52, 211, 153, 0.12), transparent 60%),
+        radial-gradient(800px 500px at 95% 0%, rgba(56, 189, 248, 0.1), transparent 55%),
+        var(--bg);
+    }
+
+    a { color: var(--accent); }
+
+    .wrap {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 34px 22px 54px;
+    }
+
+    header.hero {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 10px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px var(--accent-soft);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(26px, 3.2vw, 40px);
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    .lede {
+      max-width: 680px;
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .badge {
+      padding: 5px 11px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(15, 24, 41, 0.75);
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .badge strong { color: var(--text); font-weight: 600; }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 350px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+
+    .terminal {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      background: #060b14;
+      box-shadow:
+        0 30px 80px -30px rgba(0, 0, 0, 0.9),
+        0 0 0 1px rgba(255, 255, 255, 0.02) inset;
+    }
+
+    .terminal-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--border-soft);
+      background: linear-gradient(180deg, #101a2c, #0b1423);
+    }
+
+    .dot { width: 11px; height: 11px; border-radius: 50%; }
+    .dot.red { background: #ff5f57; }
+    .dot.yellow { background: #febc2e; }
+    .dot.green { background: #28c840; }
+
+    .terminal-title {
+      margin-left: 8px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: #93a8c7;
+    }
+
+    .live-pill {
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 9px;
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 10.5px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .live-pill::before {
+      content: "";
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .terminal-output {
+      height: 560px;
+      overflow-y: auto;
+      padding: 18px 20px 14px;
+      font-family: var(--mono);
+      font-size: 13.5px;
+      line-height: 1.55;
+      color: #c7d6ea;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      scrollbar-color: #2a3b59 #0a1220;
+      scrollbar-width: thin;
+    }
+
+    .terminal-output::-webkit-scrollbar { width: 10px; }
+    .terminal-output::-webkit-scrollbar-track { background: #0a1220; }
+    .terminal-output::-webkit-scrollbar-thumb {
+      background: #2a3b59;
+      border: 2px solid #0a1220;
+      border-radius: 8px;
+    }
+
+    .terminal-input-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 13px 20px 16px;
+      border-top: 1px solid var(--border-soft);
+      background: #091120;
+    }
+
+    .prompt-label {
+      flex: 0 1 auto;
+      max-width: 70%;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--accent);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #command-input {
+      flex: 1 1 120px;
+      min-width: 60px;
+      padding: 4px 0;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: #f2f7ff;
+      font-family: var(--mono);
+      font-size: 13.5px;
+      caret-color: var(--accent);
+    }
+
+    #command-input::placeholder { color: #546a8b; }
+    #command-input:disabled { cursor: not-allowed; }
+    #command-input:disabled::placeholder { color: #47597a; }
+
+    .send-btn {
+      padding: 7px 13px;
+      border: 1px solid rgba(52, 211, 153, 0.4);
+      border-radius: 8px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .send-btn:hover:not(:disabled) { background: rgba(52, 211, 153, 0.2); }
+    .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .terminal-foot {
+      padding: 9px 20px 12px;
+      border-top: 1px solid rgba(23, 36, 58, 0.6);
+      color: #5f7394;
+      font-size: 11.5px;
+      background: #08101d;
+    }
+
+    .side { display: grid; gap: 14px; }
+
+    .card {
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(17, 27, 45, 0.92), rgba(12, 20, 34, 0.92));
+      box-shadow: 0 18px 40px -30px rgba(0, 0, 0, 0.9);
+    }
+
+    .card h2 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 12px;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #a9bddb;
+    }
+
+    .card h2 .icon {
+      display: inline-grid;
+      place-items: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      letter-spacing: 0;
+    }
+
+    .steps {
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .steps li { margin-bottom: 8px; }
+    .steps li:last-child { margin-bottom: 0; }
+    .steps strong { color: var(--text); }
+    .steps code {
+      padding: 1px 5px;
+      border: 1px solid var(--border-soft);
+      border-radius: 4px;
+      background: #0a1220;
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .controls {
+      display: grid;
+      gap: 8px;
+      margin-top: 15px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 13px;
+      border-radius: 9px;
+      border: 1px solid transparent;
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.12s ease, background 0.12s ease, opacity 0.12s ease;
+    }
+
+    .btn:active:not(:disabled) { transform: translateY(1px); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .btn-primary {
+      background: linear-gradient(180deg, #45e0aa, #22b981);
+      color: #04231a;
+      box-shadow: 0 8px 24px -12px rgba(52, 211, 153, 0.8);
+    }
+
+    .btn-primary:hover:not(:disabled) { background: linear-gradient(180deg, #5cebb9, #2acb91); }
+
+    .btn-ghost {
+      border-color: var(--border);
+      background: #0d1728;
+      color: #b9cbe4;
+    }
+
+    .btn-ghost:hover:not(:disabled) { background: #122136; }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+    }
+
+    .menu-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 10px;
+      border: 1px solid var(--border-soft);
+      border-radius: 8px;
+      background: #0c1525;
+      color: #b9cbe4;
+      font-family: var(--sans);
+      font-size: 12px;
+      text-align: left;
+      cursor: pointer;
+      transition: background 0.12s ease, border-color 0.12s ease, opacity 0.12s ease;
+    }
+
+    .menu-btn span.num {
+      display: inline-grid;
+      place-items: center;
+      flex: 0 0 auto;
+      width: 19px;
+      height: 19px;
+      border-radius: 5px;
+      background: #16233a;
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .menu-btn:hover:not(:disabled) {
+      background: #122136;
+      border-color: #2b4062;
+    }
+
+    .menu-btn:disabled { opacity: 0.32; cursor: not-allowed; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .stat {
+      padding: 10px 11px;
+      border: 1px solid var(--border-soft);
+      border-radius: 9px;
+      background: #0a1322;
+    }
+
+    .stat .label {
+      display: block;
+      margin-bottom: 4px;
+      color: #7d92b2;
+      font-size: 10.5px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .stat .value {
+      color: #f1f6ff;
+      font-family: var(--mono);
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .stat .value.accent { color: var(--accent); }
+
+    .muted {
+      margin: 10px 0 0;
+      color: #7d92b2;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .kbd-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 12px;
+    }
+
+    kbd {
+      padding: 3px 7px;
+      border: 1px solid #2a3b59;
+      border-bottom-width: 2px;
+      border-radius: 5px;
+      background: #0b1423;
+      color: #c4d4ea;
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+
+    footer.page-foot {
+      margin-top: 26px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border-soft);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 22px;
+      justify-content: space-between;
+      color: #647897;
+      font-size: 12px;
+    }
+
+    footer.page-foot a { color: #9fb6d6; text-decoration: none; }
+    footer.page-foot a:hover { color: var(--accent); }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 560px) {
+      .wrap { padding: 22px 14px 40px; }
+      .terminal-output { height: 480px; padding: 14px; font-size: 12.5px; }
+      .terminal-input-row { padding: 11px 14px 14px; }
+      .terminal-foot { padding: 8px 14px 11px; }
+      .menu-grid { grid-template-columns: 1fr; }
+      .prompt-label { font-size: 12px; }
+      #command-input { font-size: 16px; } /* avoids iOS zoom */
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Interactive demo · Week 01 Python Basics</p>
+        <h1>Smart Grocery Store</h1>
+        <p class="lede">
+          A live, browser-based version of <strong>smart_store_management.py</strong>. Add products,
+          update stock, process sales, and generate the store report using the same menu, validation,
+          and messages as the Python program.
+        </p>
+        <div class="badges">
+          <span class="badge"><strong>Python 3</strong> concept demo</span>
+          <span class="badge">No install needed</span>
+          <span class="badge">Data stays in memory</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <a class="btn btn-ghost" href="smart_store_management.py">View Python source</a>
+        <a class="btn btn-ghost" href="README.md">README</a>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="terminal" aria-label="Smart Grocery Store terminal demo">
+        <div class="terminal-bar">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+          <span class="terminal-title">smart_store_management.py — Python 3</span>
+          <span class="live-pill" id="live-pill">live</span>
+        </div>
+
+        <div
+          class="terminal-output"
+          id="output"
+          role="log"
+          aria-live="polite"
+          aria-label="Program output"
+        ></div>
+
+        <form class="terminal-input-row" id="input-form" autocomplete="off">
+          <label class="sr-only" for="command-input">Terminal input</label>
+          <span class="prompt-label" id="prompt-label">Enter your choice:</span>
+          <input
+            id="command-input"
+            type="text"
+            inputmode="text"
+            placeholder="Type a menu number (1–8) and press Enter"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <button class="send-btn" id="send-btn" type="submit">Send</button>
+        </form>
+
+        <div class="terminal-foot">
+          Tip: menu shortcuts are enabled only on the main menu, just like the real program.
+        </div>
+      </section>
+
+      <aside class="side">
+        <section class="card">
+          <h2><span class="icon">▶</span> Run the demo</h2>
+          <ol class="steps">
+            <li>Click <strong>Run sample demo</strong> to watch the full flow automatically.</li>
+            <li>Or type <code>1</code>–<code>8</code> in the terminal and press <strong>Enter</strong>.</li>
+            <li>Use the menu shortcuts below once the main menu is showing.</li>
+          </ol>
+          <div class="controls">
+            <button class="btn btn-primary" id="demo-btn" type="button">▶ Run sample demo</button>
+            <button class="btn btn-ghost" id="restart-btn" type="button">↻ Restart demo</button>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2><span class="icon">⌘</span> Main menu shortcuts</h2>
+          <div class="menu-grid" id="menu-grid">
+            <button class="menu-btn" type="button" data-choice="1"><span class="num">1</span> Add product</button>
+            <button class="menu-btn" type="button" data-choice="2"><span class="num">2</span> View products</button>
+            <button class="menu-btn" type="button" data-choice="3"><span class="num">3</span> Search</button>
+            <button class="menu-btn" type="button" data-choice="4"><span class="num">4</span> Update stock</button>
+            <button class="menu-btn" type="button" data-choice="5"><span class="num">5</span> Process sale</button>
+            <button class="menu-btn" type="button" data-choice="6"><span class="num">6</span> Sales records</button>
+            <button class="menu-btn" type="button" data-choice="7"><span class="num">7</span> Store report</button>
+            <button class="menu-btn" type="button" data-choice="8"><span class="num">8</span> Exit</button>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2><span class="icon">▦</span> Live store status</h2>
+          <div class="stats">
+            <div class="stat">
+              <span class="label">Products</span>
+              <span class="value" id="stat-products">0</span>
+            </div>
+            <div class="stat">
+              <span class="label">Units in stock</span>
+              <span class="value" id="stat-stock">0</span>
+            </div>
+            <div class="stat">
+              <span class="label">Sales</span>
+              <span class="value" id="stat-sales">0</span>
+            </div>
+            <div class="stat">
+              <span class="label">Revenue</span>
+              <span class="value accent" id="stat-revenue">Rs. 0</span>
+            </div>
+          </div>
+          <p class="muted">Updates after every action. Refreshing the page clears all data.</p>
+        </section>
+
+        <section class="card">
+          <h2><span class="icon">≡</span> Try these inputs</h2>
+          <div class="kbd-row">
+            <kbd>1</kbd><kbd>101</kbd><kbd>Rice</kbd><kbd>Grains</kbd><kbd>250.50</kbd><kbd>20</kbd>
+          </div>
+          <p class="muted">
+            Add a product, then try <kbd>5</kbd> to sell 3 units and <kbd>7</kbd> for the report.
+            Enter <kbd>abc</kbd> at a price or quantity prompt to see validation in action.
+          </p>
+        </section>
+      </aside>
+    </main>
+
+    <footer class="page-foot">
+      <span>Browser demo of <a href="smart_store_management.py">smart_store_management.py</a> — mirrored in JavaScript for easy sharing.</span>
+      <span>Open <a href="index.html">index.html</a> directly, or serve it with <code>python -m http.server</code>.</span>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      /* ------------------------------------------------------------------
+       * State — mirrors the Python program's products / sales_records lists
+       * ------------------------------------------------------------------ */
+      let products = [];
+      let salesRecords = [];
+      let state = "menu";
+      let pending = {};
+      let promptText = "Enter your choice: ";
+      let autoplay = false;
+      let runToken = 0;
+
+      const output = document.getElementById("output");
+      const input = document.getElementById("command-input");
+      const promptLabel = document.getElementById("prompt-label");
+      const form = document.getElementById("input-form");
+      const sendBtn = document.getElementById("send-btn");
+      const demoBtn = document.getElementById("demo-btn");
+      const restartBtn = document.getElementById("restart-btn");
+      const menuButtons = Array.from(document.querySelectorAll(".menu-btn"));
+      const livePill = document.getElementById("live-pill");
+      const statProducts = document.getElementById("stat-products");
+      const statStock = document.getElementById("stat-stock");
+      const statSales = document.getElementById("stat-sales");
+      const statRevenue = document.getElementById("stat-revenue");
+
+      const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+      /* ------------------------------------------------------------------
+       * Output helpers
+       * ------------------------------------------------------------------ */
+      function print() {
+        const text = Array.prototype.slice.call(arguments).join(" ");
+        output.textContent += text + "\n";
+        output.scrollTop = output.scrollHeight;
+      }
+
+      // Python prints floats like 250.5 and 250.0 (not 250).
+      function pyFloat(value) {
+        if (!Number.isFinite(value)) return String(value);
+        if (Number.isInteger(value)) return value.toFixed(1);
+        return String(value);
+      }
+
+      function revenueText() {
+        if (salesRecords.length === 0) return "0";
+        return pyFloat(salesRecords.reduce((sum, sale) => sum + sale.total, 0));
+      }
+
+      function setPrompt(text, placeholder) {
+        promptText = text;
+        promptLabel.textContent = text;
+        input.placeholder =
+          placeholder ||
+          (state === "menu"
+            ? "Type a menu number (1–8) and press Enter"
+            : "Type your response and press Enter");
+      }
+
+      function focusInput() {
+        if (!autoplay && state !== "exit" && !input.disabled) {
+          input.focus({ preventScroll: true });
+        }
+      }
+
+      function syncStats() {
+        const totalStock = products.reduce((sum, product) => sum + product.stock, 0);
+        statProducts.textContent = String(products.length);
+        statStock.textContent = String(totalStock);
+        statSales.textContent = String(salesRecords.length);
+        statRevenue.textContent = "Rs. " + revenueText();
+      }
+
+      function syncControls() {
+        const onMenu = state === "menu" && !autoplay;
+        menuButtons.forEach((button) => {
+          button.disabled = !onMenu;
+        });
+        demoBtn.disabled = autoplay;
+        input.disabled = autoplay || state === "exit";
+        sendBtn.disabled = autoplay || state === "exit";
+        livePill.textContent = autoplay ? "demo" : "live";
+        livePill.style.opacity = autoplay ? "0.7" : "1";
+      }
+
+      /* ------------------------------------------------------------------
+       * Program flow — ported from smart_store_management.py
+       * ------------------------------------------------------------------ */
+      function showBanner() {
+        print("=".repeat(45));
+        print("       SMART GROCERY STORE SYSTEM");
+        print("=".repeat(45));
+      }
+
+      function showMenu() {
+        state = "menu";
+        print();
+        print("========== MAIN MENU ==========");
+        print("1. Add New Product");
+        print("2. View All Products");
+        print("3. Search Product");
+        print("4. Update Product Stock");
+        print("5. Process Customer Sale");
+        print("6. View Sales Records");
+        print("7. Generate Store Report");
+        print("8. Exit");
+        print();
+        setPrompt("Enter your choice: ");
+      }
+
+      function toMenu() {
+        showMenu();
+      }
+
+      function isDigits(value) {
+        return /^[0-9]+$/.test(value);
+      }
+
+      function isValidPrice(value) {
+        // Mirrors price.replace(".", "", 1).isdigit()
+        const withoutFirstDot = value.replace(".", "");
+        return withoutFirstDot.length > 0 && /^[0-9]+$/.test(withoutFirstDot);
+      }
+
+      function viewProducts() {
+        print("\n----- Available Products -----");
+        if (products.length === 0) {
+          print("No products available.");
+        } else {
+          products.forEach((product) => {
+            print("\nProduct ID:", product.id);
+            print("Product Name:", product.name);
+            print("Category:", product.category);
+            print("Price: Rs.", pyFloat(product.price));
+            print("Available Stock:", product.stock);
+          });
+        }
+        toMenu();
+      }
+
+      function viewSales() {
+        print("\n----- Sales Records -----");
+        if (salesRecords.length === 0) {
+          print("No sales records available.");
+        } else {
+          salesRecords.forEach((sale) => {
+            print("\nProduct ID:", sale.id);
+            print("Product Name:", sale.name);
+            print("Quantity Sold:", sale.quantity);
+            print("Total Amount: Rs.", pyFloat(sale.total));
+          });
+        }
+        toMenu();
+      }
+
+      function generateReport() {
+        print("\n========== STORE REPORT ==========");
+
+        const totalStock = products.reduce((sum, product) => sum + product.stock, 0);
+        print("Total Products:", products.length);
+        print("Total Available Stock:", totalStock);
+        print("Total Sales Transactions:", salesRecords.length);
+        print("Total Revenue: Rs.", revenueText());
+
+        print("\nProducts with Low Stock:");
+        const lowStock = products.filter((product) => product.stock < 5);
+        if (lowStock.length === 0) {
+          print("No products with low stock.");
+        } else {
+          lowStock.forEach((product) => {
+            print(product.name, "-", product.stock, "units");
+          });
+        }
+
+        if (products.length > 0) {
+          const prices = products.map((product) => product.price);
+          const highestPrice = Math.max.apply(null, prices);
+          const lowestPrice = Math.min.apply(null, prices);
+
+          print("\nProduct with Highest Price:");
+          products
+            .filter((product) => product.price === highestPrice)
+            .forEach((product) => {
+              print(product.name, "- Rs.", pyFloat(product.price));
+            });
+
+          print("\nProduct with Lowest Price:");
+          products
+            .filter((product) => product.price === lowestPrice)
+            .forEach((product) => {
+              print(product.name, "- Rs.", pyFloat(product.price));
+            });
+        } else {
+          print("\nNo products available for price comparison.");
+        }
+
+        print("==================================");
+        toMenu();
+      }
+
+      function exitProgram() {
+        print("\nThank you for using Smart Grocery Store System!");
+        state = "exit";
+        setPrompt("", "Session ended — click Restart demo");
+        promptLabel.textContent = "";
+        input.disabled = true;
+        sendBtn.disabled = true;
+        syncStats();
+        syncControls();
+      }
+
+      function handleInput(raw) {
+        if (state === "exit") return;
+
+        // Echo the prompt and the answer, like a real terminal.
+        print(promptText + raw);
+        input.value = "";
+
+        const currentState = state;
+
+        switch (currentState) {
+          /* ----------------------------- Main menu ----------------------------- */
+          case "menu": {
+            if (raw === "1") {
+              print("\n----- Add New Product -----");
+              pending = {};
+              state = "add_id";
+              setPrompt("Enter product ID: ");
+            } else if (raw === "2") {
+              viewProducts();
+            } else if (raw === "3") {
+              print("\n----- Search Product -----");
+              state = "search_value";
+              setPrompt("Enter product name or ID: ");
+            } else if (raw === "4") {
+              print("\n----- Update Product Stock -----");
+              state = "update_id";
+              setPrompt("Enter product ID: ");
+            } else if (raw === "5") {
+              print("\n----- Process Customer Sale -----");
+              state = "sale_id";
+              setPrompt("Enter product ID: ");
+            } else if (raw === "6") {
+              viewSales();
+            } else if (raw === "7") {
+              generateReport();
+            } else if (raw === "8") {
+              exitProgram();
+            } else {
+              print("Invalid choice! Please select between 1 and 8.");
+              toMenu();
+            }
+            break;
+          }
+
+          /* ----------------------------- Add product --------------------------- */
+          case "add_id": {
+            if (products.some((product) => product.id === raw)) {
+              print("Product ID already exists!");
+              toMenu();
+              break;
+            }
+            pending.id = raw;
+            state = "add_name";
+            setPrompt("Enter product name: ");
+            break;
+          }
+
+          case "add_name": {
+            pending.name = raw;
+            state = "add_category";
+            setPrompt("Enter product category: ");
+            break;
+          }
+
+          case "add_category": {
+            pending.category = raw;
+            state = "add_price";
+            setPrompt("Enter product price: ");
+            break;
+          }
+
+          case "add_price": {
+            if (!isValidPrice(raw)) {
+              print("Invalid price! Enter a valid number.");
+              setPrompt("Enter product price: ");
+              break;
+            }
+            pending.price = parseFloat(raw);
+            state = "add_stock";
+            setPrompt("Enter available stock: ");
+            break;
+          }
+
+          case "add_stock": {
+            if (!isDigits(raw)) {
+              print("Invalid stock! Enter a whole number.");
+              setPrompt("Enter available stock: ");
+              break;
+            }
+            const newProduct = {
+              id: pending.id,
+              name: pending.name,
+              category: pending.category,
+              price: pending.price,
+              stock: parseInt(raw, 10)
+            };
+            products.push(newProduct);
+            print("\nProduct added successfully!");
+            pending = {};
+            toMenu();
+            break;
+          }
+
+          /* ----------------------------- Search -------------------------------- */
+          case "search_value": {
+            const searchValue = raw.trim();
+            let found = false;
+            products.forEach((product) => {
+              if (
+                product.id === searchValue ||
+                product.name.toLowerCase() === searchValue.toLowerCase()
+              ) {
+                print("\nProduct Found!");
+                print("Product ID:", product.id);
+                print("Product Name:", product.name);
+                print("Category:", product.category);
+                print("Price: Rs.", pyFloat(product.price));
+                print("Available Stock:", product.stock);
+                found = true;
+              }
+            });
+            if (!found) print("Product not found.");
+            toMenu();
+            break;
+          }
+
+          /* ----------------------------- Update stock -------------------------- */
+          case "update_id": {
+            const product = products.find((item) => item.id === raw);
+            if (!product) {
+              print("Product not found.");
+              toMenu();
+              break;
+            }
+            pending.product = product;
+            print("Product Name:", product.name);
+            print("Current Stock:", product.stock);
+            print();
+            print("1. Add Stock");
+            print("2. Set New Stock Quantity");
+            state = "update_choice";
+            setPrompt("Enter your choice: ");
+            break;
+          }
+
+          case "update_choice": {
+            if (raw === "1" || raw === "2") {
+              pending.mode = raw;
+              state = "update_quantity";
+              setPrompt(raw === "1" ? "Enter quantity to add: " : "Enter new stock quantity: ");
+              break;
+            }
+            print("Invalid choice!");
+            toMenu();
+            break;
+          }
+
+          case "update_quantity": {
+            const product = pending.product;
+            if (isDigits(raw)) {
+              const quantity = parseInt(raw, 10);
+              if (pending.mode === "1") {
+                product.stock += quantity;
+                print("Stock added successfully!");
+              } else {
+                product.stock = quantity;
+                print("Stock updated successfully!");
+              }
+            } else {
+              print("Invalid quantity!");
+            }
+            print("Updated Stock:", product.stock);
+            toMenu();
+            break;
+          }
+
+          /* ----------------------------- Process sale -------------------------- */
+          case "sale_id": {
+            const product = products.find((item) => item.id === raw);
+            if (!product) {
+              print("Product not found.");
+              toMenu();
+              break;
+            }
+            pending.product = product;
+            print("Product Name:", product.name);
+            print("Available Stock:", product.stock);
+            print("Price: Rs.", pyFloat(product.price));
+            state = "sale_quantity";
+            setPrompt("Enter purchase quantity: ");
+            break;
+          }
+
+          case "sale_quantity": {
+            const product = pending.product;
+
+            if (!isDigits(raw)) {
+              print("Invalid quantity! Enter numbers only.");
+              toMenu();
+              break;
+            }
+
+            const quantity = parseInt(raw, 10);
+
+            if (quantity <= 0) {
+              print("Quantity must be greater than zero.");
+            } else if (quantity <= product.stock) {
+              const totalAmount = quantity * product.price;
+              product.stock -= quantity;
+              salesRecords.push({
+                id: product.id,
+                name: product.name,
+                quantity: quantity,
+                total: totalAmount
+              });
+              print("\nSale completed successfully!");
+              print("Product:", product.name);
+              print("Quantity Sold:", quantity);
+              print("Total Amount: Rs.", pyFloat(totalAmount));
+              print("Remaining Stock:", product.stock);
+            } else {
+              print("Insufficient stock!");
+              print("Available Stock:", product.stock);
+            }
+
+            toMenu();
+            break;
+          }
+
+          default:
+            toMenu();
+        }
+
+        syncStats();
+        syncControls();
+        focusInput();
+      }
+
+      /* ------------------------------------------------------------------
+       * Demo controls
+       * ------------------------------------------------------------------ */
+      function resetDemo() {
+        runToken += 1;
+        autoplay = false;
+        products = [];
+        salesRecords = [];
+        pending = {};
+        state = "menu";
+        output.textContent = "";
+        input.value = "";
+        input.disabled = false;
+        sendBtn.disabled = false;
+
+        showBanner();
+        showMenu();
+        syncStats();
+        syncControls();
+        focusInput();
+      }
+
+      async function runSampleDemo() {
+        resetDemo();
+        const token = runToken;
+        autoplay = true;
+        syncControls();
+        input.value = "";
+
+        const steps = [
+          ["1", 520],
+          ["101", 260],
+          ["Rice", 240],
+          ["Grains", 240],
+          ["250.50", 300],
+          ["20", 280],
+          ["2", 620],
+          ["3", 320],
+          ["rice", 320],
+          ["5", 380],
+          ["101", 260],
+          ["3", 300],
+          ["6", 520],
+          ["7", 900],
+          ["8", 700]
+        ];
+
+        await sleep(600);
+        if (token !== runToken) return;
+
+        for (const [value, pause] of steps) {
+          if (token !== runToken) return;
+
+          for (const character of value) {
+            if (token !== runToken) return;
+            input.value += character;
+            await sleep(38);
+          }
+
+          await sleep(160);
+          if (token !== runToken) return;
+          handleInput(value);
+          await sleep(pause);
+        }
+
+        if (token !== runToken) return;
+        autoplay = false;
+        syncControls();
+      }
+
+      /* ------------------------------------------------------------------
+       * Event wiring
+       * ------------------------------------------------------------------ */
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        if (autoplay || state === "exit") return;
+        handleInput(input.value);
+      });
+
+      menuButtons.forEach((button) => {
+        button.addEventListener("click", function () {
+          if (state !== "menu" || autoplay) return;
+          handleInput(button.getAttribute("data-choice"));
+        });
+      });
+
+      demoBtn.addEventListener("click", runSampleDemo);
+      restartBtn.addEventListener("click", resetDemo);
+
+      // Keep the prompt visible when the user clicks anywhere in the terminal.
+      document.querySelector(".terminal").addEventListener("click", function (event) {
+        if (event.target.closest("a, button")) return;
+        focusInput();
+      });
+
+      resetDemo();
+    })();
+  </script>
+</body>
+</html>
